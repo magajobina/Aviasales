@@ -1,0 +1,19 @@
+.tickets__more {
+  border-radius: 5px;
+  background: #2196f3;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.66667;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #fff;
+  padding: 15px 20px;
+  width: 100%;
+  margin-top: 20px;
+  transition: all .2s;
+
+  &:hover {
+    background: #48a9f8;
+  }
+}
