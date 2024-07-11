@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/self-closing-comp */
 import classNames from 'classnames'
-import Counter from '../Counter'
+// import Counter from '../Counter'
 import Checkboxes from '../Checkboxes/Checkboxes'
 import Filters from '../Filters/Filters'
 import Tickets from '../Tickets'
@@ -14,7 +14,7 @@ import logo from './Logo.svg'
 function App() {
   return (
     <div className={classes.App}>
-      <Counter />
+      {/* <Counter /> */}
       <div className={classes.logo}>
         <a href="/">
           <img className={classes.logo__img} src={logo} alt="logo" />
