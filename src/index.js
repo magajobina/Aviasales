@@ -1,18 +1,23 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable default-param-last */
 import ReactDOM from 'react-dom/client'
-import { configureStore, asyncThunkCreator } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
-import { reducer } from './reducers/reducer'
-import { logger } from './middleware/logger'
+// import { logger } from './middleware/logger'
+import mainReducer from './appSlice/mainSlice'
 import App from './components/App'
 import './index.scss'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
+// const store = configureStore({
+//   reducer, // пока у меня один redu
+//   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+// })
 const store = configureStore({
-  reducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  reducer: {
+    main: mainReducer,
+  },
 })
 
 root.render(

@@ -3,17 +3,22 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { toggledCheckbox } from '../../appSlice/mainSlice'
 import classes from './Checkboxes.module.scss'
-import * as actions from '../../actions/actions'
 
 const isCheckedHelper = (checkboxes, name) => {
   return checkboxes.find((item) => item.name === name).checked
 }
 
-function Checkboxes({ onCheck, checkboxes }) {
-  // console.log(checkboxes)
+function Checkboxes() {
+  // useSelector тупо получает в коллбеке state и при возврате возвращает чо скажем
+  const checkboxes = useSelector((state) => state.main.checkboxes)
+  const dispatch = useDispatch()
+
+  const onCheck = (e) => {
+    dispatch(toggledCheckbox({ name: e.target.name, checked: e.target.checked }))
+  }
 
   return (
     <aside className={classes.checkboxes}>
@@ -74,18 +79,4 @@ function Checkboxes({ onCheck, checkboxes }) {
   )
 }
 
-const mapStateToProps = (state) => {
-  return {
-    checkboxes: state.checkboxes,
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    onCheck: (e) => {
-      dispatch(actions.memCheckbox(e.target.name, e.target.checked))
-    },
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Checkboxes)
+export default Checkboxes
