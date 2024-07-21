@@ -1,12 +1,4 @@
 .tickets {
-  flex-grow: 1;
-
-  &__list {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
 
   &__item {
     border-radius: 5px;

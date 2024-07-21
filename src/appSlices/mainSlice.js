@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 const initialState = {
   checkboxes: [
@@ -25,7 +25,28 @@ const initialState = {
       checked: false,
     },
   ],
+  tickets: {
+    tickets: [],
+    stop: null,
+  },
+  status: null,
+  error: null,
+  searchID: null,
 }
+
+export const fetchTickets = createAsyncThunk('main/fetchTickets', async () => {
+  const baseUrl = 'https://aviasales-test-api.kata.academy'
+  const searchIdUrl = '/search'
+  const ticketsUrl = '/tickets'
+
+  const responseID = await fetch(baseUrl + searchIdUrl)
+  const { searchId } = await responseID.json()
+
+  const responseTickets = await fetch(`${baseUrl}${ticketsUrl}?searchId=${searchId}`)
+  const ticketsList = await responseTickets.json()
+
+  return ticketsList
+})
 
 const mainSlice = createSlice({
   name: 'main',
@@ -55,6 +76,22 @@ const mainSlice = createSlice({
         if (checkbox.name === 'all') checkbox.checked = areAllChecked
       })
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTickets.pending, (state, action) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(fetchTickets.fulfilled, (state, action) => {
+        state.status = 'resolved'
+        console.log(action.payload)
+        state.tickets = action.payload
+      })
+      .addCase(fetchTickets.rejected, (state, action) => {
+        state.status = 'rejected'
+        state.error = action.error.message
+      })
   },
 })
 

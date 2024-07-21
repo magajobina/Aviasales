@@ -4,7 +4,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import { useSelector, useDispatch } from 'react-redux'
-import { toggledCheckbox } from '../../appSlice/mainSlice'
+import { toggledCheckbox } from '../../appSlices/mainSlice'
+
 import classes from './Checkboxes.module.scss'
 
 const isCheckedHelper = (checkboxes, name) => {
