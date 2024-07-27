@@ -1,51 +1,66 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-continue */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 const initialState = {
   checkboxes: [
-    {
-      name: 'all',
-      checked: false,
-    },
-    {
-      name: 'without_transfers',
-      checked: false,
-    },
-    {
-      name: 'one_transfer',
-      checked: false,
-    },
-    {
-      name: 'two_transfers',
-      checked: false,
-    },
-    {
-      name: 'three_transfers',
-      checked: false,
-    },
+    { name: 'all', checked: false },
+    { name: 'without_transfers', checked: false },
+    { name: 'one_transfer', checked: false },
+    { name: 'two_transfers', checked: false },
+    { name: 'three_transfers', checked: false },
   ],
-  tickets: {
-    tickets: [],
-    stop: null,
-  },
+  tickets: [],
+  stop: null,
   status: null,
   error: null,
-  searchID: null,
+  searchId: null,
 }
 
-export const fetchTickets = createAsyncThunk('main/fetchTickets', async () => {
+// Создаем thunk для получения searchId
+export const fetchSearchId = createAsyncThunk('main/fetchSearchId', async () => {
   const baseUrl = 'https://aviasales-test-api.kata.academy'
   const searchIdUrl = '/search'
-  const ticketsUrl = '/tickets'
 
   const responseID = await fetch(baseUrl + searchIdUrl)
-  const { searchId } = await responseID.json()
+  const data = await responseID.json()
+  return data.searchId
+})
+
+// Создаем thunk для получения пачки билетов
+export const fetchTicketsBatch = createAsyncThunk('main/fetchTicketsBatch', async (searchId) => {
+  const baseUrl = 'https://aviasales-test-api.kata.academy'
+  const ticketsUrl = '/tickets'
 
   const responseTickets = await fetch(`${baseUrl}${ticketsUrl}?searchId=${searchId}`)
+  if (!responseTickets.ok) {
+    throw new Error(`Error ${responseTickets.status}: ${responseTickets.statusText}`)
+  }
   const ticketsList = await responseTickets.json()
-
   return ticketsList
+})
+
+// Создаем thunk для циклического получения билетов
+export const fetchTickets = createAsyncThunk('main/fetchTickets', async (_, { dispatch, getState }) => {
+  const searchId = await dispatch(fetchSearchId()).unwrap()
+
+  let stop = false
+
+  while (!stop) {
+    try {
+      const ticketsList = await dispatch(fetchTicketsBatch(searchId)).unwrap()
+      dispatch(addTickets(ticketsList.tickets))
+      stop = ticketsList.stop
+    } catch (error) {
+      console.error('Error fetching tickets:', error)
+    }
+  }
+
+  return searchId
 })
 
 const mainSlice = createSlice({
@@ -55,7 +70,6 @@ const mainSlice = createSlice({
     toggledCheckbox(state, action) {
       const { payload } = action
 
-      // Если чекбокс All был выбран то втыкаем return т.к. дальше делать нечего
       if (payload.name === 'all') {
         state.checkboxes.forEach((checkbox) => {
           checkbox.checked = payload.checked
@@ -63,30 +77,40 @@ const mainSlice = createSlice({
         return
       }
 
-      // выбираем конкретный чекбокс и меняем его на противоположный
       state.checkboxes.forEach((checkbox) => {
         if (checkbox.name === payload.name) checkbox.checked = !checkbox.checked
       })
 
-      // Если все кроме All нажаты то будет true, а иначе false
       const areAllChecked = state.checkboxes.every((checkbox) => checkbox.name === 'all' || checkbox.checked)
 
-      // устанавливаем состояние чекбокса All в соответствие с areAllChecked
       state.checkboxes.forEach((checkbox) => {
         if (checkbox.name === 'all') checkbox.checked = areAllChecked
       })
     },
+    addTickets(state, action) {
+      state.tickets = [...state.tickets, ...action.payload]
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTickets.pending, (state, action) => {
+      .addCase(fetchSearchId.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(fetchSearchId.fulfilled, (state, action) => {
+        state.searchId = action.payload
+        state.status = 'resolved'
+      })
+      .addCase(fetchSearchId.rejected, (state, action) => {
+        state.status = 'rejected'
+        state.error = action.error.message
+      })
+      .addCase(fetchTickets.pending, (state) => {
         state.status = 'loading'
         state.error = null
       })
       .addCase(fetchTickets.fulfilled, (state, action) => {
         state.status = 'resolved'
-        console.log(action.payload)
-        state.tickets = action.payload
       })
       .addCase(fetchTickets.rejected, (state, action) => {
         state.status = 'rejected'
@@ -95,9 +119,5 @@ const mainSlice = createSlice({
   },
 })
 
-// `createSlice` automatically generated action creators with these names.
-// export them as named exports from this "slice" file
-export const { toggledCheckbox } = mainSlice.actions
-
-// Export the slice reducer as the default export
+export const { toggledCheckbox, addTickets } = mainSlice.actions
 export default mainSlice.reducer
