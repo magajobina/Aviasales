@@ -1,20 +1,15 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/self-closing-comp */
 import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 import { fetchTickets } from '../../appSlices/mainSlice'
 import Checkboxes from '../Checkboxes/Checkboxes'
 import Filters from '../Filters/Filters'
-import Ticket from '../Ticket'
 import MoreBtn from '../MoreBtn/MoreBtn'
 import classes from './App.module.scss'
 import logo from './Logo.svg'
 import TicketsList from '../TicketsList/TicketsList'
 
-function App() {
+export default function App() {
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -44,4 +39,3 @@ function App() {
   )
 }
 
-export default App

@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable default-param-last */
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import store from './store'

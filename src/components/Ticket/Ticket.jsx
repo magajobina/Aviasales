@@ -1,6 +1,5 @@
-/* eslint-disable consistent-return */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
+
 import { add, format, intervalToDuration } from 'date-fns'
 import classes from './Ticket.module.scss'
 
